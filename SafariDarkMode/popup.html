@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Safari Dark Mode</title>
+    <link rel="stylesheet" href="popup.css">
+  </head>
+  <body>
+    <main>
+      <header class="brand">
+        <img src="icons/icon-48.png" width="38" height="38" alt="">
+        <div>
+          <h1>Dark Mode</h1>
+          <p>Light pages, comfortably dark.</p>
+        </div>
+      </header>
+
+      <section class="status-card" aria-live="polite">
+        <span id="status-dot" class="status-dot checking"></span>
+        <div>
+          <strong id="status-title">Checking this page…</strong>
+          <span id="status-detail">Theme detection is automatic.</span>
+        </div>
+      </section>
+
+      <section class="controls" aria-label="Dark mode settings">
+        <label class="control-row" for="global-toggle">
+          <span>
+            <strong>Dark mode</strong>
+            <small>Automatically darken light websites</small>
+          </span>
+          <span class="switch">
+            <input id="global-toggle" type="checkbox">
+            <span class="slider"></span>
+          </span>
+        </label>
+
+        <label class="control-row" for="site-toggle">
+          <span>
+            <strong>This website</strong>
+            <small id="site-name">Current site</small>
+          </span>
+          <span class="switch">
+            <input id="site-toggle" type="checkbox">
+            <span class="slider"></span>
+          </span>
+        </label>
+      </section>
+
+      <p class="footnote">Images and video keep their original colors.</p>
+    </main>
+    <script src="popup.js"></script>
+  </body>
+</html>

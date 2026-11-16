@@ -1,0 +1,57 @@
+/*
+ * The content script adds color overrides only to elements that need them.
+ * Scoping every rule to data-sdm-active makes disabling the extension instant
+ * and restores the page's original styles without destructive inline edits.
+ */
+
+html[data-sdm-active="true"] {
+  color-scheme: dark !important;
+  background-color: #101317 !important;
+}
+
+html[data-sdm-active="true"] [data-sdm-bg] {
+  background-color: var(--sdm-bg) !important;
+}
+
+html[data-sdm-active="true"] [data-sdm-fg] {
+  color: var(--sdm-fg) !important;
+}
+
+html[data-sdm-active="true"] [data-sdm-border] {
+  border-top-color: var(--sdm-border-top) !important;
+  border-right-color: var(--sdm-border-right) !important;
+  border-bottom-color: var(--sdm-border-bottom) !important;
+  border-left-color: var(--sdm-border-left) !important;
+}
+
+html[data-sdm-active="true"] [data-sdm-svg-fill] {
+  fill: var(--sdm-svg-fill) !important;
+}
+
+html[data-sdm-active="true"] [data-sdm-svg-stroke] {
+  stroke: var(--sdm-svg-stroke) !important;
+}
+
+html[data-sdm-active="true"] input,
+html[data-sdm-active="true"] textarea,
+html[data-sdm-active="true"] select,
+html[data-sdm-active="true"] button {
+  color-scheme: dark !important;
+}
+
+html[data-sdm-active="true"] ::selection {
+  color: #ffffff !important;
+  background: #315f9f !important;
+}
+
+html[data-sdm-active="true"] {
+  scrollbar-color: #59616d #171b20;
+}
+
+/* Photos and other media keep their original appearance. */
+html[data-sdm-active="true"] img,
+html[data-sdm-active="true"] picture,
+html[data-sdm-active="true"] video,
+html[data-sdm-active="true"] canvas {
+  filter: none !important;
+}

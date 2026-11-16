@@ -48,10 +48,4 @@ html[data-sdm-active="true"] {
   scrollbar-color: #59616d #171b20;
 }
 
-/* Photos and other media keep their original appearance. */
-html[data-sdm-active="true"] img,
-html[data-sdm-active="true"] picture,
-html[data-sdm-active="true"] video,
-html[data-sdm-active="true"] canvas {
-  filter: none !important;
-}
+/* Media filters and background images are left to the website. */

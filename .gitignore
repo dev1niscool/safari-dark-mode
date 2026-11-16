@@ -10,3 +10,16 @@ xcuserdata/
 *.xcuserdatad/
 *.xccheckout
 *.moved-aside
+*.app/
+*.ipa
+*.pkg
+*.mobileprovision
+*.provisionprofile
+*.p12
+*.pfx
+*.key
+*.pem
+.env
+.env.*
+__pycache__/
+node_modules/

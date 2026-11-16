@@ -22,12 +22,8 @@ xcrun safari-web-extension-converter \
   --no-open \
   --no-prompt
 
-PROJECT_FILE="$PROJECT_DIR/Safari Dark Mode/Safari Dark Mode.xcodeproj/project.pbxproj"
-if [[ -f "$PROJECT_FILE" ]]; then
-  # Apple's converter defaults to an ad-hoc “Sign to Run Locally” identity,
-  # which Safari hides unless unsigned-extension developer mode is enabled.
-  /usr/bin/sed -i '' '/CODE_SIGN_IDENTITY.* = "-";/d' "$PROJECT_FILE"
-fi
+python3 "$SCRIPT_DIR/scripts/sanitize-project.py" "$PROJECT_DIR"
+python3 "$SCRIPT_DIR/scripts/check-privacy.py" --directory "$PROJECT_DIR"
 
 print "Created the Safari Xcode project at: $PROJECT_DIR"
 print "Choose your development team for both targets before running it."

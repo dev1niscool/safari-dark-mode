@@ -20,7 +20,7 @@ The ready-to-build Xcode project is included. Xcode is required to sign and inst
 
 The generated macOS app is only a container for the Safari extension. Keep it installed while using the extension.
 
-To regenerate a fresh Xcode container after changing the extension source, give the helper a new output path:
+To regenerate a fresh Xcode container after changing the extension source, install Python 3 and give the helper a new output path. The helper removes generated author headers, native logging, signing settings, and unused permissions, then runs the privacy check:
 
 ```sh
 ./make-safari-project.sh SafariDarkModeApp-New
@@ -43,4 +43,45 @@ Safari 15.4 or newer is recommended for Manifest V3 support.
 
 Safari Dark Mode collects no analytics, browsing history, personal information, or device identifiers. It makes no network requests. The extension stores only its enabled state and the hostnames the user explicitly excludes, using Safari's local extension storage.
 
-The repository intentionally contains no development-team identifier, signing identity, local filesystem path, Xcode user state, or author name. Each person building the app supplies their own signing team locally in Xcode.
+The published source intentionally contains no personal author name, development-team identifier, signing identity, personal filesystem path, or Xcode user state. Each person building the app supplies their own signing team locally in Xcode. The native container does not request outbound network or user-selected file access.
+
+A public GitHub repository still identifies its owning account. Source privacy checks do not make that account anonymous, remove existing copies, or guarantee security on every website.
+
+
+## Development checks
+
+The extension itself has no package dependencies. Node.js 20 or newer, Python 3, and Playwright are used only for development checks:
+
+```sh
+npm ci
+npx playwright install chromium
+npm test
+npm run test:privacy
+python3 scripts/check-privacy.py
+python3 scripts/check-privacy.py --history
+node --check SafariDarkMode/content.js
+node --check SafariDarkMode/popup.js
+python3 -m json.tool SafariDarkMode/manifest.json >/dev/null
+```
+
+Use `SDM_BROWSER_PATH` to test with an existing browser executable. Use `SDM_BROWSER=webkit npm test` after installing Playwright WebKit and its platform dependencies for an additional engine check. These tests use mocked extension APIs; they do not replace testing the installed extension in Safari.
+
+After every source edit, copy matching files from `SafariDarkMode/` to `SafariDarkModeApp/Safari Dark Mode/Safari Dark Mode Extension/Resources/` and confirm that the directories match:
+
+```sh
+diff -qr SafariDarkMode "SafariDarkModeApp/Safari Dark Mode/Safari Dark Mode Extension/Resources"
+```
+
+Before distributing a source ZIP, run `python3 scripts/check-privacy.py --archive RELEASE.zip`. The checker scans candidate source files, including binary strings, for common personal paths, credentials, signing configuration, and unwanted artifacts. It is a guard against common mistakes, not an exhaustive personal-data detector. Git history needs its separate check above.
+
+On macOS with Xcode, also build the unsigned container:
+
+```sh
+xcodebuild -quiet \
+  -project "SafariDarkModeApp/Safari Dark Mode/Safari Dark Mode.xcodeproj" \
+  -scheme "Safari Dark Mode" -configuration Release \
+  -derivedDataPath "$TMPDIR/safari-dark-mode-build" \
+  CODE_SIGNING_ALLOWED=NO build
+```
+
+Reload a page after changing its native theme if detection does not refresh. Closed shadow roots, ancestor-driven style changes, and some complex CSS colors remain limitations of generic color conversion.

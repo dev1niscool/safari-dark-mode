@@ -45,10 +45,10 @@
 
   function sendMessage(tabID, message) {
     if (globalThis.browser) {
-      return extensionAPI.tabs.sendMessage(tabID, message);
+      return extensionAPI.tabs.sendMessage(tabID, message, { frameId: 0 });
     }
     return new Promise((resolve, reject) => {
-      extensionAPI.tabs.sendMessage(tabID, message, (response) => {
+      extensionAPI.tabs.sendMessage(tabID, message, { frameId: 0 }, (response) => {
         const error = extensionAPI.runtime.lastError;
         if (error) reject(error);
         else resolve(response);
@@ -59,7 +59,9 @@
   function normalizedSettings(value) {
     return {
       globalEnabled: value?.globalEnabled !== false,
-      excludedHosts: Array.isArray(value?.excludedHosts) ? value.excludedHosts : []
+      excludedHosts: Array.isArray(value?.excludedHosts)
+        ? value.excludedHosts.filter((host) => typeof host === "string" && host.length > 0)
+        : []
     };
   }
 

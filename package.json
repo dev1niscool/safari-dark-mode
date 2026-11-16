@@ -1,0 +1,12 @@
+{
+  "name": "safari-dark-mode-checks",
+  "private": true,
+  "scripts": {
+    "test": "node --test tests/browser.test.cjs",
+    "check:privacy": "python3 scripts/check-privacy.py",
+    "test:privacy": "python3 scripts/test-privacy.py"
+  },
+  "devDependencies": {
+    "playwright": "1.62.1"
+  }
+}

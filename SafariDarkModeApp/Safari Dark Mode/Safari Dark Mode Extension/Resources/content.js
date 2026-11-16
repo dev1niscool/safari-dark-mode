@@ -7,7 +7,7 @@
   globalThis.__safariDarkModeLoaded = true;
 
   const extensionAPI = globalThis.browser ?? globalThis.chrome;
-  const root = document.documentElement;
+  let root;
   const DEFAULT_SETTINGS = Object.freeze({
     globalEnabled: true,
     excludedHosts: []
@@ -358,7 +358,6 @@
   }
 
   function processElement(element) {
-    const originalInlineStyle = element.getAttribute("style");
     clearElementOverrides(element);
     const computed = getComputedStyle(element);
 
@@ -404,12 +403,9 @@
 
     // The observer watches author changes to the style attribute. Remember our
     // own final value so those writes do not recursively trigger more work.
-    const updatedInlineStyle = element.getAttribute("style");
-    if (updatedInlineStyle !== originalInlineStyle) {
-      selfAuthoredStyles.set(element, updatedInlineStyle);
-    } else {
-      selfAuthoredStyles.delete(element);
-    }
+    // Removing and restoring the same overrides still queues style mutations.
+    // Keep the marker even when the final value matches the starting value.
+    selfAuthoredStyles.set(element, element.getAttribute("style"));
   }
 
   function processTree(startNode, currentRunID) {
@@ -423,7 +419,7 @@
           current &&
           currentRunID === runID &&
           processed < 350 &&
-          (!deadline || deadline.timeRemaining() > 1)
+          (!deadline || deadline.didTimeout || deadline.timeRemaining() > 1)
         ) {
           processElement(current);
           current = walker.nextNode();
@@ -460,7 +456,9 @@
     mutationObserver = new MutationObserver((mutations) => {
       if (!state.active) return;
 
+      const currentRunID = runID;
       scheduleIdle(() => {
+        if (!state.active || currentRunID !== runID) return;
         const seen = new Set();
         const ignoredSelfStyles = new Set();
         for (const mutation of mutations) {
@@ -510,6 +508,16 @@
   async function evaluateAndApply() {
     const currentRunID = ++runID;
     stopObserving();
+
+    // At document_start the parser may not have created the root yet. Storage
+    // and popup events can also arrive before the initial readiness wait ends.
+    if (document.readyState === "loading" || !document.documentElement) {
+      await waitForPage();
+      if (currentRunID !== runID) return state;
+    }
+    root = document.documentElement;
+    if (!root) return state;
+
     root.removeAttribute("data-sdm-active");
     root.setAttribute("data-sdm-processing", "true");
 
